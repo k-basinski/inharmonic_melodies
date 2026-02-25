@@ -5,15 +5,16 @@ import pandas as pd
 # %%
 
 def generate_blocks(pid):
-    sounds_per_block = 10
-
-    harmonicity = ['harmonic', 'inharmonic']
-    harm_trigs = [0, 100]
+    melodies = list(range(1,31))
+    harmonicity = ['inh']*15 + ['harm']*15
+    harm_trigs = [100]*15 + [0]*15
     
     # make long list of everything
-    sounds = [(i, lh, lht) for i in range(sounds_per_block) for lh,lht in zip(harmonicity, harm_trigs)]
+    # sounds = [(i, lh, lht) for i in melodies for lh,lht in zip(harmonicity, harm_trigs)]
+    # df = pd.DataFrame(sounds, columns=['sid', 'harmonicity', 'harmonicity_trigs'])
+    sounds = [(i, lh, lht) for i, lh, lht in zip(melodies, harmonicity, harm_trigs)]
     df = pd.DataFrame(sounds, columns=['sid', 'harmonicity', 'harmonicity_trigs'])
-    
+
     # append pid
     df['pid'] = pid
 
@@ -30,7 +31,7 @@ def generate_blocks(pid):
     return dfp
 
 # %%
-generate_blocks(1)
+df = generate_blocks(1)
 # %%
 for p in range(40):
     d = generate_blocks(p)
