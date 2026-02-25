@@ -1,5 +1,5 @@
 /paradigm/soundpool/*.wav
-
+/paradigm/logs
 ### macOS template
 # General
 .DS_Store
