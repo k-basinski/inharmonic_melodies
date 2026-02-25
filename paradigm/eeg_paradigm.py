@@ -25,12 +25,13 @@ class Logger:
         df = pd.DataFrame(self.log)
         df.to_csv(f"{self.config['fpath']}p{self.pid}_log.csv")
 
-    def save_demography(self, age, gender):
+    def save_demography(self, age, gender, group):
         df = pd.DataFrame(
             {
                 "pid": self.pid,
                 "age": age,
                 "gender": gender,
+                "group": group,
                 "abs_time": core.getAbsTime(),
             },
             index=[0],
@@ -42,7 +43,7 @@ class Paradigm:
     config = {
         "send_triggers": False,  # turn on/off sending triggers via serial port
         "soundpool_path": "soundpool/",
-        "ioi": 120.0,  # inter-onset-interval in seconds
+        "ioi": 120,  # inter-onset-interval in seconds
         "full_screen": False,  # should the app run full-screen
         "no_blocks": 30
     }
@@ -103,6 +104,14 @@ class Paradigm:
         self.message.text = message_text
         self.win.flip()
         event.waitKeys(keyList=["space"])
+
+    def ask_question(self, question_text):
+        self.message.text = question_text
+        self.win.flip()
+        response = event.waitKeys(keyList=["1", "2", "3", "4", "5", "6", "7"])
+        return int(response[0])
+
+
 
     def quit_exp(self):
         self.win.close()
@@ -166,24 +175,32 @@ class Paradigm:
             trig = o["trig"]
             self.send_trigger(trig)
 
-            logger.add_log(
-                {
-                    "sound": o["sid"],
-                    "harmonicity": o["harmonicity"],
-                    "soundfile": fname,
-                    "tigger": trig
-                }
-            )
 
             # send trigger and play sound on this win flip
             self.win.flip()
 
             # wait the duration of sequence
-            # self.wait(self.config['ioi'])
-            self.wait(5)
+            self.wait(self.config['ioi'])
+            # self.wait(5)
 
             # tu pokaż pytania do uczestnika
-            self.show_splash_screen("How you doin?")
+            q1_ans = self.ask_question("Pytanie 1")
+            q2_ans = self.ask_question("Pytanie 2")
+            q3_ans = self.ask_question("Pytanie 3")
+            self.show_splash_screen("R U ready?! [space]")
+
+
+            logger.add_log(
+                {
+                    "sound": o["sid"],
+                    "harmonicity": o["harmonicity"],
+                    "soundfile": fname,
+                    "tigger": trig,
+                    "q1": q1_ans,
+                    "q2": q2_ans,
+                    "q3": q3_ans,
+                }
+            )
 
             logger.save_log()
             
