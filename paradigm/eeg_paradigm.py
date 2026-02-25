@@ -8,6 +8,7 @@ prefs.hardware["audioLatencyMode"] = 4
 
 
 class Logger:
+    """Logs demography and other stuff."""
     config = {"fpath": "logs/", "write_to_csv": True}
     log = []
 
@@ -41,64 +42,17 @@ class Paradigm:
     config = {
         "send_triggers": False,  # turn on/off sending triggers via serial port
         "soundpool_path": "soundpool/",
-        "ioi": 3.0,  # inter-onset-interval in seconds
-        "sounds_per_block": 400,  # how many sounds to play per block
-        "frequencies": list(range(200, 550, 50)),  # which frequencies to probe
-        "sp_max_index": 10,  # max index of audio files in sound pool
-        "deviant_probability": 0.2,  # probability of deviant
-        "standards_at_start": 6,  # make sure this many standards are at the start of each block
-        "standards_after_deviant": 3,  # make sure that at least this many standards are after each deviant
+        "ioi": 120.0,  # inter-onset-interval in seconds
         "full_screen": False,  # should the app run full-screen
+        "no_blocks": 30
     }
 
     # default random number generator
     rng = np.random.default_rng()
 
     # blocks to run
-    blocks = list(range(1))
+    blocks = list(range(config['no_blocks']))
     current_block = None
-
-    def make_oddballs(self):
-        """Make a list with classic oddball structure.
-
-        Returns:
-            list: A list of s's (standard) or d's (deviant).
-        """
-        out = ["s"] * self.config["standards_at_start"]
-        i = self.config["standards_at_start"]
-
-        while i < self.config["sounds_per_block"]:
-            if self.rng.random() < self.config["deviant_probability"]:  # if deviant
-                out.append("d")
-                i += 1
-                for _ in range(self.config["standards_after_deviant"]):
-                    out.append("s")
-                    i += 1
-            else:
-                out.append("s")
-                i += 1
-
-        return out
-
-    def make_roving_oddballs(self):
-        # unused
-        # frequency alphabet
-        alphabet = self.config["frequencies"]
-
-        # repetitions
-        repetitions = [4, 5, 6, 7]
-
-        # start with 10 standards
-        seq = [self.rng.choice(alphabet)] * 10
-
-        while len(seq) <= self.config["sounds_per_block"]:
-            choose_f = self.rng.choice(alphabet)
-            repeat = self.rng.choice(repetitions)
-            if choose_f != seq[-1]:  # rejection sampling
-                for _ in range(repeat):
-                    seq.append(choose_f)
-
-        return seq
 
     def send_trigger(self, value):
         """
@@ -144,16 +98,6 @@ class Paradigm:
         next_flip = self.win.getFutureFlipTime(clock="ptb")
         sound_object.play(when=next_flip)
 
-    def calculate_trigger(self, isdev, block, blockstart=False):
-        if isdev:
-            stdev = 100
-        else:
-            stdev = 0
-
-        if blockstart:
-            stdev += 200
-
-        return block + 1 + stdev
 
     def show_splash_screen(self, message_text):
         self.message.text = message_text
@@ -164,10 +108,9 @@ class Paradigm:
         self.win.close()
         core.quit()
 
-    def update_msg(self, sound_index=None, block_index=None, fname=None):
+    def update_msg(self, sound_index=None):
         self.message.text = f"""
-        Running block {block_index} out of {len(self.blocks)}.\n 
-        Playing sound {sound_index} out of {self.config["sounds_per_block"]}\n File name {fname}."""
+        Playing sound {sound_index}"""
 
     def run_paradigm(self) -> None:
         if self.config["send_triggers"]:
@@ -187,7 +130,7 @@ class Paradigm:
         )
 
         # show id dialog box
-        dlg = {"pid": "", "gender": "", "age": ""}
+        dlg = {"pid": "", "gender": "", "age": "", 'group': ""}
         gui.DlgFromDict(dlg, title="Demography", show=True)
         pid = int(dlg["pid"])
 
@@ -196,10 +139,10 @@ class Paradigm:
 
         # create logger
         logger = Logger(pid)
-        logger.save_demography(dlg["age"], dlg["gender"])
+        logger.save_demography(dlg["age"], dlg["gender"], dlg["group"])
 
         # load block data
-        block_list = pd.read_csv(f"soundpool//p{pid}_blocks.csv")
+        block_list = pd.read_csv(f"soundpool/p{pid}_blocks.csv")
 
         self.show_splash_screen("Experiment ready to start, press space.")
 
@@ -211,10 +154,10 @@ class Paradigm:
             sobj = self.load_sound(fname)
 
             # update message on screen
-            self.update_msg(io, fname)
+            self.update_msg(fname)
 
             # wait some time
-            self.wait(0.7)
+            self.wait(.5)
 
             # que up sound playback and trigger sending on next flip
             self.play_sound(sobj)
@@ -228,6 +171,7 @@ class Paradigm:
                     "sound": o["sid"],
                     "harmonicity": o["harmonicity"],
                     "soundfile": fname,
+                    "tigger": trig
                 }
             )
 
@@ -235,12 +179,12 @@ class Paradigm:
             self.win.flip()
 
             # wait the duration of sequence
+            # self.wait(self.config['ioi'])
             self.wait(5)
 
-            # wait some more
-            self.wait(self.rng.uniform(0, 1.3))
-
+            # tu pokaż pytania do uczestnika
             self.show_splash_screen("How you doin?")
+
             logger.save_log()
             
 
