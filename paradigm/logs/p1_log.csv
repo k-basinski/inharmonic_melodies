@@ -1,3 +1,2 @@
-,sound,harmonicity,soundfile,pid,abs_time,time
-0,0,harmonic,harmonic_0.wav,1,1772006647,37.88458370798617
-1,2,harmonic,harmonic_2.wav,1,1772006655,45.64938233298017
+,sound,harmonicity,soundfile,tigger,q1,q2,q3,pid,abs_time,time
+0,11,inh,inh_11.wav,111,4,3,2,1,1772012730,51.56420970801264
