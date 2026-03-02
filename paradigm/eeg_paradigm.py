@@ -105,10 +105,16 @@ class Paradigm:
         self.win.flip()
         event.waitKeys(keyList=["space"])
 
-    def ask_question(self, question_text):
+    def ask_question_a(self, question_text):
         self.message.text = question_text
         self.win.flip()
         response = event.waitKeys(keyList=["1", "2", "3", "4", "5", "6", "7"])
+        return int(response[0])
+
+    def ask_question_b(self, question_text):
+        self.message.text = question_text
+        self.win.flip()
+        response = event.waitKeys(keyList=["1", "2", "3"])
         return int(response[0])
 
 
@@ -153,7 +159,13 @@ class Paradigm:
         # load block data
         block_list = pd.read_csv(f"soundpool/p{pid}_blocks.csv")
 
-        self.show_splash_screen("Experiment ready to start, press space.")
+        self.show_splash_screen(
+            "Badanie będzie składać się z 30 bloków, podczas których będzie Pan/Pani słuchać różnych melodii. "
+            "Prosimy o aktywne słuchanie prezentowanych materiałów dźwiękowych. "
+            "W trakcie słuchania prosimy o skupienie wzroku na środku ekranu (w tym miejscu wyświetlany będzie krzyżyk) oraz o zminimalizowanie ruchów ciała. "
+            "Podczas przerw będzie można zmienić pozycję lub swobodnie się poruszać.Po każdym bloku zostanie zadane pytanie dotyczące wysłuchanej melodii (nie ma odpowiedzi błędnych). "
+            "Po zakończeniu każdego bloku będzie czas na przerwę. "
+            "Prosimy nacisnąć spację, aby rozpocząć badanie.")
 
         for io, o in block_list.iterrows():
             # build a filename to load the file
@@ -163,7 +175,8 @@ class Paradigm:
             sobj = self.load_sound(fname)
 
             # update message on screen
-            self.update_msg(fname)
+            # self.update_msg(fname)
+            self.show_splash_screen("+")
 
             # wait some time
             self.wait(.5)
@@ -184,10 +197,15 @@ class Paradigm:
             # self.wait(5)
 
             # tu pokaż pytania do uczestnika
-            q1_ans = self.ask_question("Pytanie 1")
-            q2_ans = self.ask_question("Pytanie 2")
-            q3_ans = self.ask_question("Pytanie 3")
-            self.show_splash_screen("R U ready?! [space]")
+            q1_ans = self.ask_question_b("Ile dźwięków słyszał/a Pan/i?"
+                                         "1 - jeden 2 - dwa 3 - więcej ")
+            q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu znana?"
+                                         "1 - zupełnie nieznana 7 - doskonale znana")
+            q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu przyjemna?"
+                                         "1 - bardzo nieprzyjemna 7 - bardzo przyjemna")
+            self.show_splash_screen(
+                "To jest moment, w którym można zrobić krótką przerwę — odpocząć, poruszać się, napić wody lub porozmawiać z nami. "
+                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej.")
 
 
             logger.add_log(
@@ -206,7 +224,7 @@ class Paradigm:
             
 
 
-        self.show_splash_screen("Experiment ended, press <space> to exit.")
+        self.show_splash_screen("To już koniec badania, Dziękujemy za udział!")
 
 
 pdigm = Paradigm()
