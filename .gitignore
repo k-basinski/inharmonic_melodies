@@ -1,5 +1,10 @@
 /paradigm/soundpool/*.wav
 /paradigm/logs
+
+# PyCharm settings
+.idea/inharmonic_melodies.iml
+.idea/misc.xml
+
 ### macOS template
 # General
 .DS_Store
