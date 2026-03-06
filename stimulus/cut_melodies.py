@@ -9,6 +9,7 @@ import soundfile as sf
 midi_fname = 'stimulus/midi/Partita_for_Solo_Flute/fp-1all.mid'
 wav_fname = 'paradigm/soundpool/harm_1.wav'
 output_folder = 'stimulus/cut_wav/test'
+output_folder2 = 'stimulus/cut_wav/test2'
 
 mid = MidiFile(midi_fname)
 wave, sr = sf.read(wav_fname)
@@ -21,7 +22,16 @@ def cut(wave, t_start, t_stop):
     start, stop = to_samp(t_start), to_samp(t_stop)
     return wave[start:stop, :]
 
+def cut_samples(wave, t_start, len):
+    return wave[t_start:t_start+len, :]
 
+t = 0
+i = 0
+for sec in range(len(wave)//4800):
+    wave_cut = cut_samples(wave, sec*48000, 48000)
+    sf.write(f'{output_folder2}/test{i}.wav', wave_cut, sr)
+    # print(t)
+    i += 1
 # %%
 t = 0
 i = 0
