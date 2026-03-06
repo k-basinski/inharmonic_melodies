@@ -44,7 +44,7 @@ class Paradigm:
         "send_triggers": False,  # turn on/off sending triggers via serial port
         "soundpool_path": "soundpool/",
         "ioi": 120,  # inter-onset-interval in seconds
-        "full_screen": False,  # should the app run full-screen
+        "full_screen": True,  # should the app run full-screen
         "no_blocks": 30
     }
 
@@ -104,6 +104,8 @@ class Paradigm:
         self.message.text = message_text
         self.win.flip()
         event.waitKeys(keyList=["space"])
+        self.message.text = ""
+        self.win.flip()
 
     def ask_question_a(self, question_text):
         self.message.text = question_text
@@ -131,6 +133,18 @@ class Paradigm:
         if self.config["send_triggers"]:
             self.port = serial.Serial("/dev/tty.usbserial-D30C1INU", 115200)
 
+        # show id dialog box
+        dlg = {"pid": "", "gender": "", "age": "", 'group': ""}
+        gui.DlgFromDict(dlg, title="Demography", show=True)
+        pid = int(dlg["pid"])
+
+        # create quit key:
+        event.globalKeys.add(key="escape", func=self.quit_exp, name="shutdown")
+
+        # create logger
+        logger = Logger(pid)
+        logger.save_demography(dlg["age"], dlg["gender"], dlg["group"])
+
         # make visual elements
         self.win = visual.Window(
             [800, 600], color="black", fullscr=self.config["full_screen"]
@@ -143,18 +157,14 @@ class Paradigm:
             alignment="center",
             autoDraw=True,
         )
-
-        # show id dialog box
-        dlg = {"pid": "", "gender": "", "age": "", 'group': ""}
-        gui.DlgFromDict(dlg, title="Demography", show=True)
-        pid = int(dlg["pid"])
-
-        # create quit key:
-        event.globalKeys.add(key="escape", func=self.quit_exp, name="shutdown")
-
-        # create logger
-        logger = Logger(pid)
-        logger.save_demography(dlg["age"], dlg["gender"], dlg["group"])
+        self.fixation_cross = visual.TextBox2(
+            self.win,
+            text="",
+            pos=(0, 0),
+            letterHeight=0.2,
+            alignment="center",
+            autoDraw=True,
+        )
 
         # load block data
         block_list = pd.read_csv(f"soundpool/p{pid}_blocks.csv")
@@ -176,7 +186,8 @@ class Paradigm:
 
             # update message on screen
             # self.update_msg(fname)
-            self.show_splash_screen("+")
+            self.fixation_cross.text = "+"
+            self.win.flip()
 
             # wait some time
             self.wait(.5)
@@ -196,13 +207,12 @@ class Paradigm:
             self.wait(self.config['ioi'])
             # self.wait(5)
 
+            # remove fixation cross before showing questions
+            self.fixation_cross.text = ""
             # tu pokaż pytania do uczestnika
-            q1_ans = self.ask_question_b("Ile dźwięków słyszał/a Pan/i?"
-                                         "1 - jeden 2 - dwa 3 - więcej ")
-            q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu znana?"
-                                         "1 - zupełnie nieznana 7 - doskonale znana")
-            q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu przyjemna?"
-                                         "1 - bardzo nieprzyjemna 7 - bardzo przyjemna")
+            q1_ans = self.ask_question_b("Ile dźwięków słyszał/a Pan/i?\n\n1 - jeden \n2 - dwa \n3 - więcej ")
+            q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu znana?\n\n1 - zupełnie nieznana 7 - doskonale znana")
+            q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu przyjemna?\n\n1 - bardzo nieprzyjemna 7 - bardzo przyjemna")
             self.show_splash_screen(
                 "To jest moment, w którym można zrobić krótką przerwę — odpocząć, poruszać się, napić wody lub porozmawiać z nami. "
                 "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej.")
