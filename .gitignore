@@ -11,6 +11,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+/stimulus/.DS_Store
 /stimulus/midi/.DS_Store
 
 # Icon must end with two \r
