@@ -1,0 +1,65 @@
+Partita_for_Solo_Flute
+
+fp-1all.mid - harm_1
+fp-2cou.mid - harm_2
+fp-3sar.mid - harm_3
+
+Sonatas_and_Partitas_for_Solo_Violin
+
+BWV1001
+vs1-4prs.mid - harm_4
+
+BWV1002
+vp1-3co.mid - harm_5
+vp1-4cod.mid - harm_6
+vp1-6sad.mid - harm_7
+vp1-7tb.mid - harm_8
+vp1-8tbd.mid - harm_9
+
+BWV1003
+vs2-4alg.mid - harm_10
+
+BWV1004
+vp2-3sar.mid - harm_11
+vp2-4gig.mid - harm_12
+
+BWV1005
+vs3-2fug.mid - harm_13
+vs3-4alg.mid - harm_14
+
+BWV1006
+vp3-1pre.mid - harm_15
+vp3-2lou.mid - harm_16
+vp3-3gav.mid - harm_17
+vp3-6gig.mid - harm_18
+
+BWV1007
+cs1-1pre.mid - harm_19
+cs1-2all.mid - harm_20
+cs1-3cou.mid - harm_21
+cs1-5men.mid - harm_22
+
+BWV1008
+cs2-1pre.mid - harm_23
+cs2-5men.mid - harm_24
+
+BWV1009
+cs3-3cou.mid - harm_25
+cs3-5bou.mid - ham_26
+
+BWV1010
+cs4-1pre.mid - harm_27
+cs4-2all.mid - harm_28
+cs4-3cou.mid - harm_29
+cs4-4sar.mid - harm_30
+cs4-5bou.mid - harm_31
+cs4-6gig.mid - harm_32
+
+
+
+
+
+
+
+
+
