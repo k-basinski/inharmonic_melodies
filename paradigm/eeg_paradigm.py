@@ -213,9 +213,11 @@ class Paradigm:
             q1_ans = self.ask_question_b("Ile dźwięków słyszał/a Pan/i?\n\n1 - jeden \n2 - dwa \n3 - więcej ")
             q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu znana?\n\n1 - zupełnie nieznana\n7 - doskonale znana")
             q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu przyjemna?\n\n1 - bardzo nieprzyjemna\n7 - bardzo przyjemna")
+            remaining_blocks = self.config["no_blocks"] - (io + 1)
             self.show_splash_screen(
-                "To jest moment, w którym można zrobić krótką przerwę — odpocząć, poruszać się, napić wody lub porozmawiać z nami. "
-                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej.")
+                f"To jest moment, w którym można zrobić krótką przerwę - odpocząć, poruszać się, napić wody lub porozmawiać z nami.\n\n"
+                f"Pozostało jeszcze {remaining_blocks} bloków.\n\n"
+                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej."
 
 
             logger.add_log(
