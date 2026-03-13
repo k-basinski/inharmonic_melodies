@@ -170,7 +170,7 @@ class Paradigm:
         block_list = pd.read_csv(f"soundpool/p{pid}_blocks.csv")
 
         self.show_splash_screen(
-            "Badanie będzie składać się z 30 bloków, podczas których będzie Pan/Pani słuchać różnych melodii. "
+            "Badanie będzie składać się z 30 bloków, podczas których usłyszysz różne melodie. "
             "Prosimy o aktywne słuchanie prezentowanych materiałów dźwiękowych. "
             "W trakcie słuchania prosimy o skupienie wzroku na środku ekranu (w tym miejscu wyświetlany będzie krzyżyk) oraz o zminimalizowanie ruchów ciała. "
             "Podczas przerw będzie można zmienić pozycję lub swobodnie się poruszać.Po każdym bloku zostanie zadane pytanie dotyczące wysłuchanej melodii (nie ma odpowiedzi błędnych). "
@@ -210,14 +210,14 @@ class Paradigm:
             # remove fixation cross before showing questions
             self.fixation_cross.text = ""
             # tu pokaż pytania do uczestnika
-            q1_ans = self.ask_question_b("Ile dźwięków słyszał/a Pan/i?\n\n1 - jeden \n2 - dwa \n3 - więcej ")
-            q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu znana?\n\n1 - zupełnie nieznana\n7 - doskonale znana")
-            q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje się Państwu przyjemna?\n\n1 - bardzo nieprzyjemna\n7 - bardzo przyjemna")
+            q1_ans = self.ask_question_b("Ile dźwięków słyszałeś/aś w tym samym czasie?\n\n1 - jeden \n2 - dwa \n3 - więcej ")
+            q2_ans = self.ask_question_a("Na ile słyszana melodia wydaje Ci się znana (od 1 do 7)?\n\n1 - zupełnie nieznana\n7 - doskonale znana")
+            q3_ans = self.ask_question_a("Na ile słyszana melodia wydaje Ci się przyjemna (od 1 do 7)?\n\n1 - bardzo nieprzyjemna\n7 - bardzo przyjemna")
             remaining_blocks = self.config["no_blocks"] - (io + 1)
             self.show_splash_screen(
-                f"To jest moment, w którym można zrobić krótką przerwę - odpocząć, poruszać się, napić wody lub porozmawiać z nami.\n\n"
+                f"To jest moment, w którym możesz zrobić sobie krótką przerwę - odpocząć, poruszać się, napić wody lub porozmawiać z nami.\n\n"
                 f"Pozostało jeszcze {remaining_blocks} bloków.\n\n"
-                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej.")
+                "Gdy będziesz gotowy/a na kolejny blok badania, naciśnij spację, aby przejść dalej.")
 
 
             logger.add_log(
