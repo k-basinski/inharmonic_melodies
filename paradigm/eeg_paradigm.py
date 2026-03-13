@@ -217,7 +217,7 @@ class Paradigm:
             self.show_splash_screen(
                 f"To jest moment, w którym można zrobić krótką przerwę - odpocząć, poruszać się, napić wody lub porozmawiać z nami.\n\n"
                 f"Pozostało jeszcze {remaining_blocks} bloków.\n\n"
-                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej."
+                "Gdy będzie Pan/Pani gotowy/a na kolejny blok badania, prosimy nacisnąć spację, aby przejść dalej.")
 
 
             logger.add_log(
