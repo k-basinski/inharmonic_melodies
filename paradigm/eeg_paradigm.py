@@ -169,6 +169,19 @@ class Paradigm:
         # load block data
         block_list = pd.read_csv(f"soundpool/p{pid}_blocks.csv")
 
+        # randomization
+        harmonic = block_list[block_list["harmonicity"] == "harm"]
+        nonharmonic = block_list[block_list["harmonicity"] == "inh"]
+
+        harmonic_sample = harmonic.sample(n=15)
+        nonharmonic_sample = nonharmonic.sample(n=15)
+
+        block_list = pd.concat([harmonic_sample, nonharmonic_sample])
+        block_list = block_list.sample(frac=1).reset_index(drop=True)
+
+        #individual randomization list
+        block_list.to_csv(f"soundpool/p{pid}_blocks.csv", index=False)
+
         self.show_splash_screen(
             "Badanie będzie składać się z 30 bloków, podczas których usłyszysz różne melodie. "
             "Prosimy o aktywne słuchanie prezentowanych materiałów dźwiękowych. "
