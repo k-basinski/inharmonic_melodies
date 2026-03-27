@@ -4,35 +4,27 @@ import pandas as pd
 
 # %%
 
+# %%
 def generate_blocks(pid):
-    melodies = list(range(1,31))
-    harmonicity = ['inh']*15 + ['harm']*15
-    harm_trigs = [100]*15 + [0]*15
-    
-    # make long list of everything
-    # sounds = [(i, lh, lht) for i in melodies for lh,lht in zip(harmonicity, harm_trigs)]
-    # df = pd.DataFrame(sounds, columns=['sid', 'harmonicity', 'harmonicity_trigs'])
-    sounds = [(i, lh, lht) for i, lh, lht in zip(melodies, harmonicity, harm_trigs)]
-    df = pd.DataFrame(sounds, columns=['sid', 'harmonicity', 'harmonicity_trigs'])
+ np.random.seed(pid)
+ melodies = list(range(1, 31))
+ # losowo wybieramy wersję dla każdego sid (15/15)
+ harmonicity = np.random.permutation(['harm']*15 + ['inh']*15)
+ df = pd.DataFrame({
+ 'sid': melodies,
+ 'harmonicity': harmonicity
+ })
+ df['harmonicity_trigs'] = df['harmonicity'].map({'inh': 100, 'harm': 0})
+ df['pid'] = pid
+ df['trig'] = df['harmonicity_trigs'] + df['sid']
+ df['filename'] = df['harmonicity'] + "_" + df['sid'].astype(str) + ".wav"
+ df = df.sample(frac=1).reset_index(drop=True)
 
-    # append pid
-    df['pid'] = pid
-
-    # calculate trigger value
-    df['trig'] = df.harmonicity_trigs + df.sid
-    
-    # format filename
-    df['filename'] = df.harmonicity + "_" + df.sid.astype(str) + ".wav"
-
-    # permute order and return
-    dfp = df.sample(frac=1)
-
-    
-    return dfp
+ return df
 
 # %%
 df = generate_blocks(1)
 # %%
-for p in range(40):
+for p in range(60):
     d = generate_blocks(p)
     d.to_csv(f'soundpool/p{p}_blocks.csv')
