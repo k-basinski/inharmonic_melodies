@@ -24,12 +24,10 @@ vp2-3sar.mid - harm_11
 vp2-4gig.mid - harm_12
 
 BWV1005
-vs3-2fug.mid - harm_13
 vs3-4alg.mid - harm_14
 
 BWV1006
-vp3-1pre.mid - harm_15
-vp3-2lou.mid - harm_16
+vp3-1pre.mid - hart_15
 vp3-3gav.mid - harm_17
 vp3-6gig.mid - harm_18
 
@@ -52,8 +50,8 @@ cs4-1pre.mid - harm_27
 cs4-2all.mid - harm_28
 cs4-3cou.mid - harm_29
 cs4-4sar.mid - harm_30
-cs4-5bou.mid - harm_31
-cs4-6gig.mid - harm_32
+cs4-5bou.mid - harm_13
+cs4-6gig.mid - harm_16
 
 
 
