@@ -2,6 +2,7 @@
 # setup
 import mne
 import matplotlib
+
 matplotlib.use('Qt5Agg')
 
 # %%
@@ -10,7 +11,7 @@ print(matplotlib.get_backend())
 # %%
 # DATA
 ch_exclude = [f'EXG{i}' for i in range(3,9)]
-raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_02.bdf',
+raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_03.bdf',
                           eog = (['EXG1', 'EXG2']),
                           exclude=ch_exclude,
                           stim_channel= 'Status',
@@ -39,42 +40,44 @@ filtered_raw.plot()
 # INTERPOLATION
 filtered_raw.plot() # zaznaczamy wadliwe kanały
 filtered_raw.interpolate_bads()
+
+# %%
 filtered_raw.plot()
 
 # %%
 # EPOCHS
 events_ids = {
-    '16' : 16,
+    '7' : 7,
+    '9' : 9,
+    '12' : 12,
+    '14' : 14,
+    '15' : 15,
     '17' : 17,
     '18' : 18,
     '19' : 19,
     '20' : 20,
     '21' : 21,
     '22' : 22,
-    '23' : 23,
-    '24' : 24,
     '25' : 25,
     '26' : 26,
-    '27' : 27,
     '28' : 28,
     '29' : 29,
-    '30' : 30,
     '101' : 101,
     '102' : 102,
-    '103' : 103,
     '104' : 104,
     '105' : 105,
     '106' : 106,
-    '107' : 107,
     '108' : 108,
-    '109' : 109,
     '110' : 110,
     '111' : 111,
-    '112' : 112,
     '113' : 113,
-    '114' : 114,
-    '115' : 115,
+    '116' : 116,
+    '123' : 123,
+    '124' : 124,
+    '127' : 127,
+    '130' : 130
 }
+
 
 events = mne.find_events(filtered_raw, stim_channel='Status')
 
@@ -100,7 +103,7 @@ ica.plot_components(inst=epochs)
 # %%
 epochs.load_data()
 ica.apply(epochs,
-          exclude=[0,13])
+          exclude=[7,9])
 
 # %%
 # automatyczne wyrzucanie oczek
@@ -132,10 +135,8 @@ ica.plot_scores(eog_scores)
 ica.plot_sources(eog_evoked)
 
 # %%
-ica.apply(epochs)
-# %%
 # SAVING
-epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_02_epo.fif',
+epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_03_epo.fif',
             fmt='double',
-            overwrite = False,
+            overwrite = True,
             )
