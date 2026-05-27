@@ -1,6 +1,7 @@
 /paradigm/soundpool/*.wav
 /paradigm/soundpool/cut_wav
 /paradigm/logs
+/inharmonic_melodies
 
 # PyCharm settings
 .idea/inharmonic_melodies.iml
