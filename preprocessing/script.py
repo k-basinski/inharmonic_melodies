@@ -6,12 +6,9 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 # %%
-print(matplotlib.get_backend())
-
-# %%
 # DATA
 ch_exclude = [f'EXG{i}' for i in range(3,9)]
-raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_03.bdf',
+raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_09.bdf',
                           eog = (['EXG1', 'EXG2']),
                           exclude=ch_exclude,
                           stim_channel= 'Status',
@@ -34,49 +31,50 @@ filtered_raw.filter(l_freq=0.1, h_freq=30)
 filtered_raw.notch_filter(50)
 
 # %%
-filtered_raw.plot()
+filtered_raw.plot() # zaznaczamy wadliwe kanały
 
 # %%
 # INTERPOLATION
-filtered_raw.plot() # zaznaczamy wadliwe kanały
 filtered_raw.interpolate_bads()
 
 # %%
-filtered_raw.plot()
+filtered_raw.plot() 
 
 # %%
 # EPOCHS
 events_ids = {
+    '2' : 2,
+    '6' : 6,
     '7' : 7,
+    '8' : 8,
     '9' : 9,
-    '12' : 12,
-    '14' : 14,
-    '15' : 15,
-    '17' : 17,
+    '16' : 16,
     '18' : 18,
-    '19' : 19,
     '20' : 20,
     '21' : 21,
-    '22' : 22,
+    '23' : 23,
+    '24' : 24,
     '25' : 25,
     '26' : 26,
-    '28' : 28,
-    '29' : 29,
+    '27' : 27,
+    '30' : 30,
     '101' : 101,
-    '102' : 102,
+    '103' : 103,
     '104' : 104,
     '105' : 105,
-    '106' : 106,
-    '108' : 108,
     '110' : 110,
     '111' : 111,
+    '112' : 112,
     '113' : 113,
-    '116' : 116,
-    '123' : 123,
-    '124' : 124,
-    '127' : 127,
-    '130' : 130
+    '114' : 114,
+    '115' : 115,
+    '117' : 117,
+    '119' : 119,
+    '122' : 122,
+    '128' : 128,
+    '129' : 129
 }
+
 
 
 events = mne.find_events(filtered_raw, stim_channel='Status')
@@ -103,7 +101,7 @@ ica.plot_components(inst=epochs)
 # %%
 epochs.load_data()
 ica.apply(epochs,
-          exclude=[7,9])
+          exclude=[0,5,6])
 
 # %%
 # automatyczne wyrzucanie oczek
@@ -136,7 +134,7 @@ ica.plot_sources(eog_evoked)
 
 # %%
 # SAVING
-epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_03_epo.fif',
+epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_09_epo.fif',
             fmt='double',
             overwrite = True,
             )
