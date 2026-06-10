@@ -1,3 +1,4 @@
+# %%
 import os
 import numpy as np
 import slab
@@ -6,20 +7,22 @@ import matplotlib.pyplot as plt
 from mtrf.model import TRF
 import pandas as pd
 from glob import glob
-
+# %%
 ##DEFINE STIMULUS AND RESPONSE
-subject = 'pilot_04'
+subject = 'pilot_08'
 new_fs = 64
 
 dur_segment = 50 #100 za długie, trzeba sprawdzić wyższe niż 50?
 len_segment = dur_segment * new_fs
 
-wav_path = 'C:/Users/ASUS/Desktop/magisterka/soundpool/harmonic/*.wav'
-path_to_fif = f"C:/Users/ASUS/Desktop/magisterka/data/{subject}_epo.fif"
+wav_path = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/sound/harmonic/*.wav'
+path_to_fif = f"/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/{subject}_epo.fif"
+# path_to_fif = "/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/*.fif"
 
 wav_files = sorted(glob(wav_path))
 
-#stimulus
+# %%
+#stimulus - calculate envelope and onset of the sound
 mvar_stimulus = []
 
 for wf in wav_files:
@@ -27,16 +30,18 @@ for wf in wav_files:
     sound = slab.Sound(wf).channel(0)
     sound = sound.resample(int(sound.samplerate / 3))
 
-    envelope = sound.envelope().resample(new_fs)
+    envelope = sound.envelope().resample(new_fs) # returns a new signal containing the lowpass Hilbert envelopes of both channels
     stim_data = envelope.data.reshape(-1, 1)
 
-    onsets = np.diff(stim_data, axis=0, prepend=np.zeros((1, 1)))
+    onsets = np.diff(stim_data, axis=0, prepend=np.zeros((1, 1))) # calculate the n-th discrete difference along the given axis
     onsets[onsets < 0] = 0
 
     mvar_epoch = np.concatenate([stim_data, onsets], axis=1)
     mvar_stimulus.append(mvar_epoch)
 
+# %%
 #response
+#glob - zwraca listę ścieżek pasujących do podanego wzorca nazwy
 response = []
 
 all_epochs_files = sorted(glob(path_to_fif))
@@ -49,8 +54,9 @@ for file in all_epochs_files:
     epochs.pick_types(eeg=True)
 
     for epoch in epochs.get_data():
-        response.append(epoch.T)
+        response.append(epoch.T) # czemu T?
 
+# %%
 #kontrolka
 print("WAV:", len(wav_files))
 print("EEG:", len(response))
@@ -58,6 +64,7 @@ print("EEG:", len(response))
 print("Stim shape:", mvar_stimulus[0].shape)
 print("Resp shape:", response[0].shape)
 
+# %%
 ##ENVELOPE AND ONSETS VISUALIZATION
 times = np.linspace(0, len(mvar_stimulus[0])/new_fs, len(mvar_stimulus[0]))
 plt.plot(times, mvar_stimulus[0][:,0], label='Envelope', alpha=0.7)
@@ -66,7 +73,9 @@ plt.xlim(5, 10)
 plt.xlabel('Time [s]')
 plt.ylabel('Ammplitude [a.u.]')
 plt.legend()
+plt.show()
 
+# %%
 ##STANDARIZATION
 for i in range(len(mvar_stimulus)):
 
@@ -89,10 +98,12 @@ for i in range(len(mvar_stimulus)):
     mvar_stimulus[i] = s[:min_len]
     response[i] = r[:min_len]
 
+# %%
 #NaN cleanup
 mvar_stimulus = [np.nan_to_num(s) for s in mvar_stimulus]
 response = [np.nan_to_num(r) for r in response]
 
+# %%
 ##PREPARING TRAINING AND TESTING DATASETS
 stim_train = mvar_stimulus[:-2]
 resp_train = response[:-2]
@@ -118,6 +129,7 @@ for s_full, r_full in zip(stim_train, resp_train):
 
 print("Segments:", len(stim_segments))
 
+# %%
 ##MODEL VALIDATION
 m_fwd_trf = TRF()
 
@@ -134,6 +146,7 @@ m_fwd_trf.train(
     regularization,
     k=3)
 
+# %%
 ##VISUALIZATION
 fig, ax = plt.subplots(3, sharex=True, figsize=(10, 10))
 
@@ -152,6 +165,7 @@ ax[2].set_title("Global Field Power")
 plt.tight_layout()
 plt.show()
 
+# %%
 #VISUALIZATION WITH MNE - poprawić wyżej channels (wywala za dużo kanałów) !!!
 from mne.channels import make_standard_montage
 montage = make_standard_montage('biosemi64')
@@ -163,6 +177,7 @@ fwd_trf_evo.plot_joint(
     ts_args={"units": "a.u.", "scalings": dict(eeg=1)},
     )
 
+# %%
 ##ESTIMATE MODEL'S ACCURACY (VISUALIZATION)
 pred, r = m_fwd_trf.predict(mvar_stimulus, response, average=False)
 idx = np.argmax(r)  # pick the channel with the best prediction
@@ -178,6 +193,7 @@ plt.xlim(20, 30)  # zoom in on the x-axis
 plt.legend()
 plt.title(f'Correlation = {r.mean().round(3)}')
 
+# %%
 ##LENGTH OF RECORDINGS - in progress !!! wykrzacza się na vizualizacji
 #parameters
 dur_segment = 50
