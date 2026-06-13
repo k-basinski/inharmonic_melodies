@@ -2,18 +2,24 @@
 # setup
 import mne
 import matplotlib
+import pandas as pd
 
 matplotlib.use('Qt5Agg')
 
 # %%
 # DATA
 ch_exclude = [f'EXG{i}' for i in range(3,9)]
-raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_09.bdf',
+raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_17.bdf',
                           eog = (['EXG1', 'EXG2']),
                           exclude=ch_exclude,
                           stim_channel= 'Status',
                           preload=True
                           )
+
+# %%
+# BLOCKS FOR EPOCHS
+blocks = pd.read_csv('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/git/inharmonic_melodies/paradigm/soundpool/p17_blocks.csv')
+
 # %%
 # MONTAGE
 raw.set_montage('biosemi64')
@@ -41,48 +47,28 @@ filtered_raw.interpolate_bads()
 filtered_raw.plot() 
 
 # %%
-# EPOCHS
-events_ids = {
-    '2' : 2,
-    '6' : 6,
-    '7' : 7,
-    '8' : 8,
-    '9' : 9,
-    '16' : 16,
-    '18' : 18,
-    '20' : 20,
-    '21' : 21,
-    '23' : 23,
-    '24' : 24,
-    '25' : 25,
-    '26' : 26,
-    '27' : 27,
-    '30' : 30,
-    '101' : 101,
-    '103' : 103,
-    '104' : 104,
-    '105' : 105,
-    '110' : 110,
-    '111' : 111,
-    '112' : 112,
-    '113' : 113,
-    '114' : 114,
-    '115' : 115,
-    '117' : 117,
-    '119' : 119,
-    '122' : 122,
-    '128' : 128,
-    '129' : 129
-}
+# FIND EPOCHS ID
+trig = blocks['trig'].tolist()
 
+string = []
+for i in trig:
+    s = str(i)
+    string.append(s)
 
+events_ids = {k: v for k, v in zip(string, trig)}
 
+# %% REMOVE USUSED EPOCHS
+events_ids.pop('3')
+events_ids.pop('22')
+print(events_ids)
+
+# %% EPOCS
 events = mne.find_events(filtered_raw, stim_channel='Status')
 
 epochs = mne.Epochs(filtered_raw,
                     events,
                     event_id=events_ids,
-                    tmax= 100,
+                    tmax= 110,
                     baseline=None, # nie robimy tu baseline correction
                     decim=8)
 
@@ -97,11 +83,10 @@ ica = mne.preprocessing.ICA(
     random_state=666)
 ica.fit(epochs)
 ica.plot_components(inst=epochs)
-
 # %%
 epochs.load_data()
 ica.apply(epochs,
-          exclude=[0,5,6])
+          exclude=[0,1,2])
 
 # %%
 # automatyczne wyrzucanie oczek
@@ -134,7 +119,9 @@ ica.plot_sources(eog_evoked)
 
 # %%
 # SAVING
-epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_09_epo.fif',
+epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_17_epo.fif',
             fmt='double',
             overwrite = True,
             )
+
+# %%
