@@ -33,7 +33,8 @@ for wf in wav_files:
     onsets = np.diff(stim_data, axis=0, prepend=np.zeros((1, 1)))
     onsets[onsets < 0] = 0
 
-    mvar_epoch = np.concatenate([stim_data, onsets], axis=1)
+    #melodic_features - do dodania
+    mvar_epoch = np.concatenate([stim_data, onsets, melodic_features], axis=1)
     mvar_stimulus.append(mvar_epoch)
 
 #response
@@ -58,7 +59,7 @@ print("EEG:", len(response))
 print("Stim shape:", mvar_stimulus[0].shape)
 print("Resp shape:", response[0].shape)
 
-##ENVELOPE AND ONSETS VISUALIZATION
+##ENVELOPE AND ONSETS VISUALIZATION - potem drugi będzie ale ładniejszy jak u Giovanniego
 times = np.linspace(0, len(mvar_stimulus[0])/new_fs, len(mvar_stimulus[0]))
 plt.plot(times, mvar_stimulus[0][:,0], label='Envelope', alpha=0.7)
 plt.plot(times, mvar_stimulus[0][:,1], label='Onsets', alpha=0.7)
@@ -121,9 +122,9 @@ print("Segments:", len(stim_segments))
 ##MODEL VALIDATION
 m_fwd_trf = TRF()
 
-tmin, tmax = -0.1, 0.4
+tmin, tmax = 0, 0.35
 
-regularization = [0.1, 1, 10] #lambda do testowania potem użyjemy np.logspace(-2, 6, 10)
+regularization = [0.1, 1, 10, 100, 1000]  #lambda do testowania potem użyjemy np.logspace(-2, 6, 10)
 
 m_fwd_trf.train(
     stim_segments,
@@ -134,176 +135,102 @@ m_fwd_trf.train(
     regularization,
     k=3)
 
+#PORÓWNANIE MODELI A I AM
+#Model A == Tylko akustyka - pierwsze 2 kolumny
+trf_A = TRF()
+trf_A.train([s[:, :2] for s in stim_segments], resp_segments, new_fs, tmin, tmax, regularization)
+_, r_A = trf_A.predict([s[:, :2] for s in stim_test], resp_test)
+
+#Model AM == Akustyka + Melodyka - wszystkie 6 kolumn)
+trf_AM = TRF()
+trf_AM.train(stim_segments, resp_segments, new_fs, tmin, tmax, regularization)
+_, r_AM = trf_AM.predict(stim_test, resp_test)
+
+# Wynik
+print(f"Średnia korelacja A: {np.nanmean(r_A)}")
+print(f"Średnia korelacja AM: {np.nanmean(r_AM)}")
+print(f"Zysk z oczekiwań melodycznych (Delta r): {np.nanmean(r_AM) - np.nanmean(r_A)}")
+
 ##VISUALIZATION
-fig, ax = plt.subplots(3, sharex=True, figsize=(10, 10))
+#Music score of a segment of auditory stimulus
+def plot_figure_1a(stimulus_data, fs, start_sec=5, end_sec=10):
+    features = ['Env', 'Onsets', 'So', 'Sp', 'Ho', 'Hp']
+    times = np.linspace(0, len(stimulus_data) / fs, len(stimulus_data))
 
-#envelope TRF
-m_fwd_trf.plot(feature=0, axes=ax[0], show=False)
-ax[0].set_title("TRF: Envelope")
+    # Wycięcie fragmentu czasu
+    mask = (times >= start_sec) & (times <= end_sec)
+    t_crop = times[mask]
+    d_crop = stimulus_data[mask]
 
-#onsets TRF
-m_fwd_trf.plot(feature=1, axes=ax[1], show=False)
-ax[1].set_title("TRF: Onsets")
+    fig, axes = plt.subplots(len(features), 1, figsize=(10, 8), sharex=True)
+    for i, feat in enumerate(features):
+        if i < d_crop.shape[3]:  # Sprawdzenie czy kolumna istnieje
+            axes[i].plot(t_crop, d_crop[:, i], color='darkgreen' if i < 2 else 'gray')
+            axes[i].set_ylabel(feat)
+            axes[i].spines['top'].set_visible(False)
+            axes[i].spines['right'].set_visible(False)
 
-#global Field Power
-m_fwd_trf.plot(channel='gfp', axes=ax[2], show=False)
-ax[2].set_title("Global Field Power")
+    axes[-1].set_xlabel('Time (s)')
+    plt.suptitle('Figure 1A: Music Representation')
+    plt.tight_layout()
+    plt.show()
 
-plt.tight_layout()
+#Prediction correlation AM + A !!! Uwaga to dla wszystkich głów
+def plot_figure_2ab(results_A, results_AM):
+    """
+    results_A: lista korelacji dla każdego badanego (model akustyczny)
+    results_AM: lista korelacji dla każdego badanego (model pełny)
+    """
+    # Figure 2A: Bar plot (Average)
+    mean_A = np.mean(results_A)
+    mean_AM = np.mean(results_AM)
+    sem_A = np.std(results_A) / np.sqrt(len(results_A))
+    sem_AM = np.std(results_AM) / np.sqrt(len(results_AM))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+    ax1.bar(['A', 'AM'], [mean_A, mean_AM], yerr=[sem_A, sem_AM], color=['green', 'coral'], capsize=5)
+    ax1.set_title('Figure 2A: All subjects')
+    ax1.set_ylabel('Prediction correlation (r)')
+
+#Wzmocnienie predykcyjene AM dla każdego badanego
+subjects = [f'S{i + 1}' for i in range(len(results_A))]
+ax2.scatter(subjects, results_AM, color='coral', label='AM')
+ax2.scatter(subjects, results_A, color='green', label='A', facecolors='none')
+
+# Rysowanie słupków zysku (Delta r)
+for i in range(len(results_A)):
+    ax2.vlines(subjects[i], results_A[i], results_AM[i], color='gray', alpha=0.5)
+
+ax2.set_title('Figure 2B: Single subject results')
+ax2.set_ylabel('r')
+ax2.legend()
+plt.xticks(rotation=45)
 plt.show()
 
-#VISUALIZATION WITH MNE - poprawić wyżej channels (wywala za dużo kanałów) !!!
-from mne.channels import make_standard_montage
-montage = make_standard_montage('biosemi64')
-fwd_trf_evo = m_fwd_trf.to_mne_evoked(montage)[0]
+#Wagi regresji grzbietowej dla TRFAM dod. i ujem. składowe TRF
+def plot_figure_2e(trf_model, channels_idx=[7, 11]):  # Np. Fz, Cz, Pz
+    # trf_model.weights ma kształt (features, lags, channels)
+    features = ['Env', "Env'", 'Sp', 'Hp', 'So', 'Ho']
+    lags = np.linspace(tmin * 1000, tmax * 1000, trf_model.weights.shape[3])
 
-fwd_trf_evo.plot_joint(
-    [0.075, 0.13, 0.36],
-    topomap_args={"scalings": 1},
-    ts_args={"units": "a.u.", "scalings": dict(eeg=1)},
-    )
+    fig, axes = plt.subplots(len(channels_idx), 1, figsize=(8, 10))
 
-##ESTIMATE MODEL'S ACCURACY (VISUALIZATION)
-pred, r = m_fwd_trf.predict(mvar_stimulus, response, average=False)
-idx = np.argmax(r)  # pick the channel with the best prediction
+    for i, ch in enumerate(channels_idx):
+        # Wyciągamy wagi dla danego kanału i normalizujemy
+        w = trf_model.weights[:, :, ch]
+        w_norm = w / np.max(np.abs(w))
 
-# Regularization changes the scale to stanardize plotting
-pred[0] = (pred[0]-pred[0].mean(axis=0))/pred[0].std(axis=0)
-times = np.linspace(0, len(response[0])/new_fs, len(response[0]))
-plt.plot(times, response[0][:, idx], label='Obsereved EEG')
-plt.plot(times, pred[0][:, idx], label='Predicted EEG')
-plt.xlabel('Time [s]')
-plt.ylabel('Amplitude [a.u.]')
-plt.xlim(20, 30)  # zoom in on the x-axis
-plt.legend()
-plt.title(f'Correlation = {r.mean().round(3)}')
+        im = axes[i].imshow(w_norm, aspect='auto', origin='lower',
+                            extent=[lags, lags[-1], 0, len(features)],
+                            cmap='RdBu_r', vmin=-1, vmax=1)
 
-##LENGTH OF RECORDINGS - in progress !!! wykrzacza się na vizualizacji
-#parameters
-dur_segment = 50
-new_fs = 64
-len_segment = dur_segment * new_fs
+        axes[i].set_yticks(np.arange(len(features)) + 0.5)
+        axes[i].set_yticklabels(features)
+        axes[i].set_title(f'Channel index: {ch}')
+        axes[i].axvline(0, color='black', linewidth=0.5)
 
-tmin = -0.1
-tmax = 0.4
-
-regularization = [0.1, 1, 10]
-
-train_durations = [30, 60, 120, 300, 600] #lambda do testowania potem użyjemy np.logspace(-2, 6, 10)
-n_repeats = 10
-
-#split data
-stimulus_train = mvar_stimulus[:-2]
-response_train = response[:-2]
-
-stimulus_test = mvar_stimulus[-2:]
-response_test = response[-2:]
-
-#segmentation
-stim_segments = []
-resp_segments = []
-
-for s_full, r_full in zip(stimulus_train, response_train):
-
-    n_seg = len(s_full) // len_segment
-
-    if n_seg < 2:
-        continue
-
-    s_crop = s_full[:n_seg * len_segment]
-    r_crop = r_full[:n_seg * len_segment]
-
-    stim_segments.extend(np.array_split(s_crop, n_seg))
-    resp_segments.extend(np.array_split(r_crop, n_seg))
-
-print("Liczba segmentów:", len(stim_segments))
-
-total_dur = len(stim_segments) * dur_segment
-print("Maksymalny czas treningu:", total_dur, "s")
-
-#analysis
-
-valid_durations = []
-r_scores_mean = []
-r_scores_std = []
-best_lambdas = []
-
-for t in train_durations:
-
-    n_seg_to_use = int(t / dur_segment)
-
-    if n_seg_to_use < 3 or n_seg_to_use > len(stim_segments):
-        continue
-
-    print(f"\nTraining duration: {t}s")
-
-    valid_durations.append(t)
-
-    r_tmp = []
-    lambda_tmp = []
-
-    for rep in range(n_repeats):
-
-        idx = np.random.choice(
-            len(stim_segments),
-            n_seg_to_use,
-            replace=False
-        )
-
-        stim_subset = [stim_segments[j] for j in idx]
-        resp_subset = [resp_segments[j] for j in idx]
-
-        trf = TRF()
-        k_cv = min(3, n_seg_to_use)
-
-        trf.train(
-            stim_subset,
-            resp_subset,
-            new_fs,
-            tmin,
-            tmax,
-            regularization,
-            k=k_cv
-        )
-
-        _, r_val = trf.predict(stimulus_test, response_test)
-
-        r_tmp.append(np.nanmean(r_val))
-        lambda_tmp.append(trf.regularization)
-
-    r_scores_mean.append(np.mean(r_tmp))
-    r_scores_std.append(np.std(r_tmp))
-    best_lambdas.append(np.median(lambda_tmp))
-
-#visualization
-
-fig, ax = plt.subplots(1, 2, figsize=(12, 5))
-
-ax[0].errorbar(
-    valid_durations,
-    r_scores_mean,
-    yerr=r_scores_std,
-    marker='o'
-)
-
-ax[0].set_title("TRF performance vs training duration")
-ax[0].set_xlabel("Training duration [s]")
-ax[0].set_ylabel("Pearson r")
-ax[0].grid(True)
-
-ax[1].semilogy(
-    valid_durations,
-    best_lambdas,
-    marker='s'
-)
-
-ax[1].set_title("Optimal regularization")
-ax[1].set_xlabel("Training duration [s]")
-ax[1].set_ylabel("Lambda")
-ax[1].grid(True)
-
-plt.tight_layout()
-plt.show()
-
-##HOW MANY PARTICIPANTS - in progress
-
+    plt.colorbar(im, ax=axes.ravel().tolist(), label='Normalised TRF weights')
+    plt.xlabel('Latency (ms)')
+    plt.suptitle('Figure 2E: TRF Weights Heatmap')
+    plt.show()
