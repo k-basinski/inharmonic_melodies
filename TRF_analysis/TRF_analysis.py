@@ -11,10 +11,10 @@ from glob import glob
 subject = 'pilot_04'
 new_fs = 64
 
-dur_segment = 50 #100 za długie, trzeba sprawdzić wyższe niż 50?
+dur_segment = 5
 len_segment = dur_segment * new_fs
 
-wav_path = 'C:/Users/ASUS/Desktop/magisterka/soundpool/harmonic/*.wav'
+wav_path = 'C:/Users/kornelia/Desktop/new_*.wav'
 path_to_fif = f"C:/Users/ASUS/Desktop/magisterka/data/{subject}_epo.fif"
 
 wav_files = sorted(glob(wav_path))
