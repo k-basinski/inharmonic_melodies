@@ -1,7 +1,11 @@
 /paradigm/soundpool/*.wav
 /paradigm/soundpool/cut_wav
 /paradigm/logs
+<<<<<<< Updated upstream
 /inharmonic_melodies
+=======
+/stimulus/output
+>>>>>>> Stashed changes
 
 # PyCharm settings
 .idea/inharmonic_melodies.iml
