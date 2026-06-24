@@ -11,6 +11,9 @@
 .idea/inharmonic_melodies.iml
 .idea/misc.xml
 
+# ZED settings
+.zed/tasks.json
+
 ### macOS template
 # General
 .DS_Store
