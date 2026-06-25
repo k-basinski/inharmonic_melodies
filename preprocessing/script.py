@@ -18,7 +18,7 @@ raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/d
 
 # %%
 # BLOCKS FOR EPOCHS
-blocks = pd.read_csv('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/git/inharmonic_melodies/paradigm/soundpool/p17_blocks.csv')
+blocks = pd.read_csv('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/git/inharmonic_melodies/paradigm/soundpool/pilot_17_logs.csv')
 
 # %%
 # MONTAGE
