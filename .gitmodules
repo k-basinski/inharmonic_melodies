@@ -1,0 +1,3 @@
+[submodule "IDyOMpy"]
+	path = IDyOMpy
+	url = https://github.com/GuiMarion/IDyOMpy
