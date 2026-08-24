@@ -8,8 +8,8 @@
 >>>>>>> Stashed changes
 
 # PyCharm settings
-.idea/inharmonic_melodies.iml
-.idea/misc.xml
+.idea
+
 
 # ZED settings
 .zed/tasks.json
@@ -23,6 +23,7 @@
 .LSOverride
 /stimulus/.DS_Store
 /stimulus/midi/.DS_Store
+**/.DS_Store
 
 # Icon must end with two \r
 Icon
