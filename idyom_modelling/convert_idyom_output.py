@@ -69,7 +69,7 @@ def load_idyom_output(idyom_obj_path):
 
 
 def main():
-    sr = 64
+    sr = 256
     sig_length = 120  # in seconds
     melodies = list(range(1, 33))
     idyom_vectors = {}
@@ -131,7 +131,7 @@ def main():
 
 def visualise_model_results(idyom_vectors):
     # load sound and reality check
-    sr = 64
+    sr = 256
     sig_length = 120
     melody_id = 2
     h2_wav, sr_wav = sf.read(f"paradigm/soundpool/harm_{melody_id}.wav")
