@@ -26,7 +26,7 @@ def generate_blocks(pid):
 # %%
 df = generate_blocks(1)
 # %%
-for p in range(60):
+for p in range(60,80):
     d = generate_blocks(p)
     d.to_csv(f'soundpool/p{p}_blocks.csv')
 

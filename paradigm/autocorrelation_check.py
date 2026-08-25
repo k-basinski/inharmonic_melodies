@@ -15,7 +15,7 @@ s_start, s_len = 6, 0.2
 s_start_smpl, s_end_smpl = int(s_start * sr), int((s_start + s_len) * sr)
 
 # plotting window
-plotting_right, plotting_left = 0, 0.1
+plotting_right, plotting_left = 0.1, 0.2
 
 # calculate autocorrelations
 harm = harm_full[s_start_smpl:s_end_smpl, 0]

@@ -12,7 +12,7 @@
 
 
 # ZED settings
-.zed/tasks.json
+.zed/*
 
 ### macOS template
 # General
