@@ -6,10 +6,10 @@ import pandas as pd
 
 matplotlib.use('Qt5Agg')
 
-# %%
+# %%whi
 # DATA
 ch_exclude = [f'EXG{i}' for i in range(3,9)]
-raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_17.bdf',
+raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_60.bdf',
                           eog = (['EXG1', 'EXG2']),
                           exclude=ch_exclude,
                           stim_channel= 'Status',
