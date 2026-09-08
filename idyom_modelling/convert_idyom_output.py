@@ -85,6 +85,17 @@ def main():
     # for each melody
     for melody in melodies:
         print(f"Calculating melody {melody}...")
+
+        # open wav file
+        h2_wav, sr_wav = sf.read(f"paradigm/soundpool/harm_{melody}.wav")
+        h2_trunc = h2_wav[: sr_wav * sig_length, 0]
+
+        # calculate envelope and onsets
+        h2_env = envelope(h2_trunc, n_out=sr * sig_length, squared=True, residual=None)
+        env_resampled = resample(h2_env, sr * sig_length)
+        onsets = np.diff(env_resampled, axis=0, prepend=0)
+
+
         # get idyom results from pickle
         idyr_pitch_length = extract_idyom_results(
             idyom_pitch_length_results, f"harm_{melody}_mono"
@@ -114,7 +125,10 @@ def main():
         vect_entropy_pitch_length[note_indices] = idyr_trunc_pitch_length["entropy"]
         vect_entropy_length[note_indices] = idyr_trunc_length["entropy"]
         vect_entropy_pitch[note_indices] = idyr_trunc_pitch["entropy"]
+
         idyom_vectors[melody] = {
+            "envelope": env_resampled,
+            "onsets": onsets,
             "pitch_IC": vect_IC_pitch,
             "length_IC": vect_IC_pitch_length,
             "pitch_length_IC": vect_IC_pitch_length,
@@ -140,14 +154,15 @@ def visualise_model_results(idyom_vectors):
     # calculate envelope and resample
     h2_env = envelope(h2_trunc, n_out=sr * sig_length, squared=True, residual=None)
     h2_resampled = resample(h2_trunc, sr * sig_length)
+    onsets = np.abs(np.diff(h2_resampled, axis=0, prepend=0))
 
     # visualize
     tmin, tmax = 105 * sr, 108 * sr
     fig, axs = plt.subplots(nrows=6, ncols=1, sharex=True)
 
     # acoustic wave
-    axs[0].plot(h2_resampled[tmin:tmax])
-    axs[0].set_ylabel('Acoustic wave')
+    axs[0].plot(onsets[tmin:tmax])
+    axs[0].set_ylabel('onsets')
 
     # amplitude envelope
     axs[1].plot(np.abs(h2_env[tmin:tmax]))
