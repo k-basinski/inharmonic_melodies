@@ -1,18 +1,13 @@
 # %%
 import numpy as np
-from numpy._core.fromnumeric import _3D
 import pandas as pd
 import matplotlib.pyplot as plt
 import mne
-import slab
-import pickle
 from glob import glob
 from mtrf.model import TRF
 import os
 import re
 import copy
-# %%
-!pwd
 # %%
 subjects = ["im_2", "im_3", "im_7"]
 new_fs = 256
