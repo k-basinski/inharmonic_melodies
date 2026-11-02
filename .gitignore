@@ -1,6 +1,8 @@
 /paradigm/soundpool/*.wav
 /paradigm/soundpool/cut_wav
 /paradigm/logs
+
+/TRF_analysis/data/epochs
 <<<<<<< Updated upstream
 /inharmonic_melodies
 =======

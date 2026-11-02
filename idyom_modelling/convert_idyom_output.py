@@ -91,9 +91,9 @@ def main():
         h2_trunc = h2_wav[: sr_wav * sig_length, 0]
 
         # calculate envelope and onsets
-        h2_env = envelope(h2_trunc, n_out=sr * sig_length, squared=True, residual=None)
+        h2_env = envelope(h2_trunc, n_out=sr * sig_length, squared=False, residual=None)
         env_resampled = resample(h2_env, sr * sig_length)
-        onsets = np.diff(env_resampled, axis=0, prepend=0)
+        onsets = np.abs(np.diff(env_resampled, axis=0, prepend=0))
 
 
         # get idyom results from pickle
