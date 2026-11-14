@@ -1,0 +1,56 @@
+---
+title: "plots"
+format: html
+editor: visual
+---
+
+# models | nofilter
+## A - acoustic
+```{r}
+data_A <- data %>% filter(model == "A") %>% filter(filter == "nofilter")
+
+formula <- c("r ~ cond * group + (1|pid)")
+formula0 <- c("r ~ (1|pid)")
+m1 <- lmer(formula, data_A)
+summary(m1)
+m0 <- lmer(formula0, data_A)
+
+# porownanie modeli
+anova(m0, m1)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1)
+
+em <- emmeans(m1, "cond", "group")
+pairs(em)
+```
+
+```{r}
+data_A %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="grey", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Acoustic feature") +
+    xlab("") +
+    stat_compare_means(
+      method = "t.test",
+      label = "p.format")
+```
+
+```{r}
+data_A %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_boxplot() +
+    theme_ipsum() +
+    stat_compare_means(
+      method = "t.test",
+      label = "p.format")
+```

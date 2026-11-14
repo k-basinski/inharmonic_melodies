@@ -6,10 +6,10 @@ import pandas as pd
 
 matplotlib.use('Qt5Agg')
 
-# %%whi
+# %%
 # DATA
 ch_exclude = [f'EXG{i}' for i in range(3,9)]
-raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_60.bdf',
+raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/eeg_data/pilot_56.bdf',
                           eog = (['EXG1', 'EXG2']),
                           exclude=ch_exclude,
                           stim_channel= 'Status',
@@ -18,7 +18,7 @@ raw = mne.io.read_raw_bdf('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/d
 
 # %%
 # BLOCKS FOR EPOCHS
-blocks = pd.read_csv('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/git/inharmonic_melodies/paradigm/soundpool/pilot_17_logs.csv')
+blocks = pd.read_csv('/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/psychopy_logs/p56_log.csv')
 
 # %%
 # MONTAGE
@@ -48,7 +48,7 @@ filtered_raw.plot()
 
 # %%
 # FIND EPOCHS ID
-trig = blocks['trig'].tolist()
+trig = blocks['tigger'].tolist()
 
 string = []
 for i in trig:
@@ -58,12 +58,13 @@ for i in trig:
 events_ids = {k: v for k, v in zip(string, trig)}
 
 # %% REMOVE USUSED EPOCHS
-events_ids.pop('3')
-events_ids.pop('22')
-print(events_ids)
+# events_ids.pop('')
+# events_ids.remove('102')
+# print(events_ids)
+# print(events_ids.pop(k) for k in ['22'])
 
 # %% EPOCS
-events = mne.find_events(filtered_raw, stim_channel='Status')
+events = mne.find_events(filtered_raw, stim_channel='Status', initial_event=True)
 
 epochs = mne.Epochs(filtered_raw,
                     events,
@@ -83,10 +84,11 @@ ica = mne.preprocessing.ICA(
     random_state=666)
 ica.fit(epochs)
 ica.plot_components(inst=epochs)
+
 # %%
 epochs.load_data()
 ica.apply(epochs,
-          exclude=[0,1,2])
+          exclude=[0])
 
 # %%
 # automatyczne wyrzucanie oczek
@@ -119,7 +121,7 @@ ica.plot_sources(eog_evoked)
 
 # %%
 # SAVING
-epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_17_epo.fif',
+epochs.save(fname = '/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/data/epochs_data/pilot_56_epo.fif',
             fmt='double',
             overwrite = True,
             )
