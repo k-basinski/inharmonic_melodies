@@ -35,6 +35,7 @@ formula0 <- c("r ~ (1|pid)")
 m1 <- lmer(formula, data_A)
 summary(m1)
 m0 <- lmer(formula0, data_A)
+summary(m0)
 
 # porownanie modeli
 anova(m0, m1)
@@ -86,8 +87,6 @@ grouped_ggwithinstats(
 )
 ```
 
-
-
 ## O - onset from IDyOM
 ```{r}
 data_O <- data %>% filter(model == "O") %>% filter(filter == "nofilter")
@@ -113,7 +112,7 @@ pairs(em)
 data_O %>%
   ggplot(aes(x=group, y=r, fill=cond)) +
     geom_violin(width=1) +
-    geom_boxplot(width=0.6, color="grey", alpha=0.2) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
     # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
     scale_fill_brewer(palette = "Set1") +
     theme_ipsum() +
@@ -122,10 +121,7 @@ data_O %>%
       plot.title = element_text(size=11)
     ) +
     ggtitle("onset IDyOM feature") +
-    xlab("") +
-    stat_compare_means(
-      method = "t.test",
-      label = "p.format")
+    xlab("")
 ```
 
 ```{r}
@@ -173,7 +169,7 @@ pairs(em)
 data_P %>%
   ggplot(aes(x=group, y=r, fill=cond)) +
     geom_violin(width=1) +
-    geom_boxplot(width=0.6, color="grey", alpha=0.2) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
     # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
     scale_fill_brewer(palette = "Set1") +
     theme_ipsum() +
@@ -182,10 +178,7 @@ data_P %>%
       plot.title = element_text(size=11)
     ) +
     ggtitle("pitch IDyOM feature") +
-    xlab("") +
-    stat_compare_means(
-      method = "t.test",
-      label = "p.format")
+    xlab("")
 ```
 
 ```{r}
@@ -207,6 +200,180 @@ grouped_ggwithinstats(
   )
 )
 ```
+
+## AO 
+```{r}
+data_AO<- data %>% filter(model == "AO") %>% filter(filter == "nofilter")
+
+formula <- c("r ~ cond * group + (1|pid)")
+formula0 <- c("r ~ (1|pid)")
+m1 <- lmer(formula, data_AO)
+summary(m1)
+m0 <- lmer(formula0, data_AO)
+
+# porownanie modeli
+anova(m0, m1)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1)
+
+em <- emmeans(m1, "cond", "group")
+pairs(em)
+```
+
+```{r}
+data_AO %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("acoustic + onset IDyOM feature") +
+    xlab("")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_AO,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```
+
+## AP
+
+```{r}
+data_AP<- data %>% filter(model == "AO") %>% filter(filter == "nofilter")
+
+formula <- c("r ~ cond * group + (1|pid)")
+formula0 <- c("r ~ (1|pid)")
+m1 <- lmer(formula, data_AP)
+summary(m1)
+m0 <- lmer(formula0, data_AP)
+
+# porownanie modeli
+anova(m0, m1)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1)
+
+em <- emmeans(m1, "cond", "group")
+pairs(em)
+```
+
+```{r}
+data_AP %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("acoustic + onset IDyOM feature") +
+    xlab("")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_AP,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```
+
+## AOP
+
+```{r}
+data_APO<- data %>% filter(model == "APO") %>% filter(filter == "nofilter")
+
+formula <- c("r ~ cond * group + (1|pid)")
+formula0 <- c("r ~ (1|pid)")
+m1 <- lmer(formula, data_APO)
+summary(m1)
+m0 <- lmer(formula0, data_APO)
+
+# porownanie modeli
+anova(m0, m1)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1)
+
+em <- emmeans(m1, "cond", "group")
+pairs(em)
+```
+
+```{r}
+data_APO %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("acoustic + onset IDyOM feature") +
+    xlab("")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_APO,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```
+
 
 # models | 1-8 Hz
 ## A - acoustic
@@ -388,6 +555,7 @@ grouped_ggwithinstats(
   )
 )
 ```
+
 
 # models | 8-30 Hz
 ## A - acoustic
