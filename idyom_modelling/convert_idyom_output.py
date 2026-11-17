@@ -89,11 +89,16 @@ def main():
         # open wav file
         h2_wav, sr_wav = sf.read(f"paradigm/soundpool/harm_{melody}.wav")
         h2_trunc = h2_wav[: sr_wav * sig_length, 0]
+        ih_wav, sr_wav = sf.read(f"paradigm/soundpool/inh_{melody}.wav")
+        ih_trunc = ih_wav[: sr_wav * sig_length, 0]
 
         # calculate envelope and onsets
         h2_env = envelope(h2_trunc, n_out=sr * sig_length, squared=False, residual=None)
-        env_resampled = resample(h2_env, sr * sig_length)
-        onsets = np.abs(np.diff(env_resampled, axis=0, prepend=0))
+        env_resampled_harm = resample(h2_env, sr * sig_length)
+        onsets_harm = np.abs(np.diff(env_resampled_harm, axis=0, prepend=0))
+        ih_env = envelope(ih_trunc, n_out=sr * sig_length, squared=False, residual=None)
+        env_resampled_ih = resample(ih_env, sr * sig_length)
+        onsets_ih = np.abs(np.diff(env_resampled_ih, axis=0, prepend=0))
 
 
         # get idyom results from pickle
@@ -127,8 +132,10 @@ def main():
         vect_entropy_pitch[note_indices] = idyr_trunc_pitch["entropy"]
 
         idyom_vectors[melody] = {
-            "envelope": env_resampled,
-            "onsets": onsets,
+            "envelope_harm": env_resampled_harm,
+            "onsets_harm": onsets_harm,
+            "envelope_ih": env_resampled_ih,
+            "onsets_ih": onsets_ih,
             "pitch_IC": vect_IC_pitch,
             "length_IC": vect_IC_pitch_length,
             "pitch_length_IC": vect_IC_pitch_length,
