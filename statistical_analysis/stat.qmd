@@ -1,0 +1,218 @@
+---
+title: "stats"
+format: html
+editor: visual
+---
+```{r}
+library(tidyverse)
+library(psych)
+library(readr)
+library(lme4)
+library(emmeans)
+library(ggplot2)
+library(ggstatsplot)
+library(hrbrthemes)
+library(viridis)
+library(ggpubr)
+```
+
+```{r}
+rm(list=ls())
+```
+
+# data
+
+```{r}
+data <- read_csv("/Users/zosiamikolajczak/ANL/ANL_inharmonic_melodies/results/results.csv")
+```
+
+
+# models | nofilter
+## A - acoustic
+```{r}
+data_A <- data %>% filter(model == "A") %>% filter(filter == "nofilter")
+
+formula_A <- c("r ~ cond * group + (1|pid)")
+formula_A_0 <- c("r ~ (1|pid)")
+formula_A_01 <- c("r ~ cond + (1|pid)")
+formula_A_02 <- c("r ~ group + (1|pid)")
+
+m1_A <- lmer(formula_A, data_A)
+summary(m1_A)
+m0_A <- lmer(formula_A_0, data_A)
+summary(m0_A)
+m01_A <- lmer(formula_A_01, data_A)
+summary(m01_A)
+m02_A <- lmer(formula_A_02, data_A)
+summary(m02_A)
+
+# porownanie modeli
+anova(m0_A, m1_A)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1_A)
+```
+
+```{r}
+data_A %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="grey", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("acoustic feature") +
+    xlab("") +
+    stat_compare_means(
+      method = "t.test",
+      label = "p.format")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_A,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```
+
+## O - onset from IDyOM
+```{r}
+data_O <- data %>% filter(model == "O") %>% filter(filter == "nofilter")
+
+formula_O <- c("r ~ cond * group + (1|pid)")
+formula_O_0 <- c("r ~ (1|pid)")
+formula_O_01 <- c("r ~ cond + (1|pid)")
+formula_O_02 <- c("r ~ group + (1|pid)")
+
+m1_O <- lmer(formula_O, data_O)
+summary(m1_O)
+m0_O <- lmer(formula_O_0, data_O)
+summary(m0_O)
+m01_O <- lmer(formula_O_01, data_O)
+summary(m01_O)
+m02_O <- lmer(formula_O_02, data_O)
+summary(m02_O)
+
+# porownanie modeli
+anova(m0_O, m1_O)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1_O)
+```
+
+```{r}
+data_O %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("onset IDyOM feature") +
+    xlab("")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_O,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```
+
+## P - pitch from IDyOM
+```{r}
+data_P<- data %>% filter(model == "P") %>% filter(filter == "nofilter")
+
+formula <- c("r ~ cond * group + (1|pid)")
+formula_P_0 <- c("r ~ (1|pid)")
+formula_P_01 <- c("r ~ cond + (1|pid)")
+formula_P_02 <- c("r ~ group + (1|pid)")
+  
+m1_P <- lmer(formula, data_P)
+summary(m1_P)
+m0_P <- lmer(formula_P_0, data_P)
+summary(m0_P)
+m01_P <- lmer(formula_P_01, data_P)
+summary(m01_P)
+m02_P <- lmer(formula_P_02, data_P)
+summary(m02_P)
+
+# porownanie modeli
+anova(m0_P, m1_P)
+
+# anova modeli mieszanych
+library(lmerTest)
+anova(m1_P)
+```
+
+```{r}
+data_P %>%
+  ggplot(aes(x=group, y=r, fill=cond)) +
+    geom_violin(width=1) +
+    geom_boxplot(width=0.6, color="black", alpha=0.2) +
+    # scale_fill_viridis(discrete = TRUE, option = "rainbow") +
+    scale_fill_brewer(palette = "Set1") +
+    theme_ipsum() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("pitch IDyOM feature") +
+    xlab("")
+```
+
+```{r}
+grouped_ggwithinstats(
+  data            = data_P,
+  x               = cond,
+  y               = r,
+  grouping.var    = group,
+  subject.id = pid,
+  point.path = FALSE,
+  yab = "r",
+  results.subtitle = FALSE,
+  digits = "signif",
+  ggplot.component = list(
+    scale_y_continuous(
+      limits = c(0, 0.1),
+      breaks = seq(0, 0.1, 0.02)
+    )
+  )
+)
+```

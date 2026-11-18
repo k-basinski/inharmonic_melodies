@@ -3,25 +3,33 @@ title: "post_hoc"
 format: html
 editor: visual
 ---
+
 ```{r}
 library(lmerTest)
 ```
 
-# models | 1-30 Hz
-## A 
+# models \| 1-30 Hz
+
+## A
+
 ```{r}
 em_A <- emmeans(m1_A, ~ cond * group)
 pairs(em_A)
+summary(em_A)
 ```
 
 ## O
+
 ```{r}
 em_O <- emmeans(m1_O, ~ cond * group)
 pairs(em_O)
+summary(em_O)
 ```
 
-## P 
+## P
+
 ```{r}
 em_P <- emmeans(m1_P, ~ cond * group)
 pairs(em_P)
+summary(em_P)
 ```
